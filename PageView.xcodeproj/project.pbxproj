@@ -10,7 +10,7 @@
 		7165DB252742A55200EFA913 /* PageView.docc in Sources */ = {isa = PBXBuildFile; fileRef = 7165DB242742A55200EFA913 /* PageView.docc */; };
 		7165DB2B2742A55300EFA913 /* PageView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7165DB202742A55200EFA913 /* PageView.framework */; };
 		7165DB302742A55300EFA913 /* PageViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7165DB2F2742A55300EFA913 /* PageViewTests.swift */; };
-		7165DB312742A55300EFA913 /* PageView.h in Headers */ = {isa = PBXBuildFile; fileRef = 7165DB232742A55200EFA913 /* PageView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7165DB3B2742A5AA00EFA913 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7165DB3A2742A5AA00EFA913 /* PageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,10 +25,10 @@
 
 /* Begin PBXFileReference section */
 		7165DB202742A55200EFA913 /* PageView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PageView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7165DB232742A55200EFA913 /* PageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PageView.h; sourceTree = "<group>"; };
 		7165DB242742A55200EFA913 /* PageView.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = PageView.docc; sourceTree = "<group>"; };
 		7165DB2A2742A55300EFA913 /* PageViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PageViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7165DB2F2742A55300EFA913 /* PageViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewTests.swift; sourceTree = "<group>"; };
+		7165DB3A2742A5AA00EFA913 /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +71,7 @@
 		7165DB222742A55200EFA913 /* PageView */ = {
 			isa = PBXGroup;
 			children = (
-				7165DB232742A55200EFA913 /* PageView.h */,
+				7165DB3A2742A5AA00EFA913 /* PageView.swift */,
 				7165DB242742A55200EFA913 /* PageView.docc */,
 			);
 			path = PageView;
@@ -92,7 +92,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7165DB312742A55300EFA913 /* PageView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +194,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7165DB252742A55200EFA913 /* PageView.docc in Sources */,
+				7165DB3B2742A5AA00EFA913 /* PageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,6 +398,7 @@
 		7165DB382742A55300EFA913 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9TJNMD67UW;
@@ -419,6 +420,7 @@
 		7165DB392742A55300EFA913 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9TJNMD67UW;
