@@ -229,6 +229,7 @@ public class PageView: UIScrollView {
     
     // MARK: - Public Interface
     @IBInspectable
+    /// Distant page content view will be removed from container if true. Default is false. "Distant" means content view is not the neighbor of current displayed page.
     public var removeContentViewWhenDistant: Bool {
         get { mainPage.removeSubviewOnHidden }
         set {
@@ -238,6 +239,7 @@ public class PageView: UIScrollView {
         }
     }
     @IBInspectable
+    /// Initial is 0. Can be set before dataSource is set.
     public var pageIndex: Int {
         get { _pageIndex }
         set {
@@ -248,6 +250,17 @@ public class PageView: UIScrollView {
             _pageIndex = newValue
             pageIndexDidSet()
         }
+    }
+    
+    /// Page content view will be reloaded if reference of page content view changed.
+    public func reloadData() {
+        if let dataSource = dataSource, (0..<dataSource.numberOfPages(in: self)).contains(pageIndex) == false {
+            // out of range
+            pageIndex = dataSource.numberOfPages(in: self) - 1
+            return
+        }
+        // refresh page content
+        pageIndexDidSet()
     }
 }
 
@@ -373,5 +386,6 @@ public protocol PageViewDataSource: NSObjectProtocol {
 
 public protocol PageViewPageDelegate: NSObjectProtocol {
     
+    /// Called when page switched. PageIndex can be the same as the last one.
     func pageView(_ pageView: PageView, didTransitionTo pageIndex: Int)
 }
