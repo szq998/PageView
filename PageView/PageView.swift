@@ -88,8 +88,8 @@ public class PageView: UIScrollView {
         ])
     }
     
-    weak var pageDelegate: PageViewPageDelegate?
-    weak var dataSource: PageViewDataSource? {
+    public weak var pageDelegate: PageViewPageDelegate?
+    public weak var dataSource: PageViewDataSource? {
         didSet {
             if !(0..<dataSource!.numberOfPages(in: self)).contains(pageIndex) {
                 pageIndex = dataSource!.numberOfPages(in: self) - 1
@@ -363,7 +363,7 @@ extension PageView: UIScrollViewDelegate {
 }
 
 // MARK: - DataSource & PageDelegate Protocal
-protocol PageViewDataSource: NSObjectProtocol {
+public protocol PageViewDataSource: NSObjectProtocol {
     
     func numberOfPages(in pageView: PageView) -> Int
     
@@ -371,7 +371,7 @@ protocol PageViewDataSource: NSObjectProtocol {
 }
 
 
-protocol PageViewPageDelegate: NSObjectProtocol {
+public protocol PageViewPageDelegate: NSObjectProtocol {
     
     func pageView(_ pageView: PageView, didTransitionTo pageIndex: Int)
 }
