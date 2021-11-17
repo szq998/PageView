@@ -88,17 +88,6 @@ public class PageView: UIScrollView {
         ])
     }
     
-    public weak var pageDelegate: PageViewPageDelegate?
-    public weak var dataSource: PageViewDataSource? {
-        didSet {
-            if !(0..<dataSource!.numberOfPages(in: self)).contains(pageIndex) {
-                pageIndex = dataSource!.numberOfPages(in: self) - 1
-            } else {
-                pageIndexDidSet()
-            }
-        }
-    }
-    
     private var mainPage = PageContainerView()
     private var prevPage = PageContainerView()
     private var nextPage = PageContainerView()
@@ -228,6 +217,17 @@ public class PageView: UIScrollView {
     }
     
     // MARK: - Public Interface
+    @IBInspectable public weak var pageDelegate: PageViewPageDelegate?
+    @IBInspectable public weak var dataSource: PageViewDataSource? {
+        didSet {
+            if !(0..<dataSource!.numberOfPages(in: self)).contains(pageIndex) {
+                pageIndex = dataSource!.numberOfPages(in: self) - 1
+            } else {
+                pageIndexDidSet()
+            }
+        }
+    }
+    
     @IBInspectable
     /// Distant page content view will be removed from container if true. Default is false. "Distant" means content view is not the neighbor of current displayed page.
     public var removeContentViewWhenDistant: Bool {
@@ -253,7 +253,7 @@ public class PageView: UIScrollView {
     }
     
     /// Page content view will be reloaded if reference of page content view changed.
-    public func reloadData() {
+    @objc public func reloadData() {
         if let dataSource = dataSource, (0..<dataSource.numberOfPages(in: self)).contains(pageIndex) == false {
             // out of range
             pageIndex = dataSource.numberOfPages(in: self) - 1
@@ -376,7 +376,7 @@ extension PageView: UIScrollViewDelegate {
 }
 
 // MARK: - DataSource & PageDelegate Protocal
-public protocol PageViewDataSource: NSObjectProtocol {
+@objc public protocol PageViewDataSource: NSObjectProtocol {
     
     func numberOfPages(in pageView: PageView) -> Int
     
@@ -384,7 +384,7 @@ public protocol PageViewDataSource: NSObjectProtocol {
 }
 
 
-public protocol PageViewPageDelegate: NSObjectProtocol {
+@objc public protocol PageViewPageDelegate: NSObjectProtocol {
     
     /// Called when page switched. PageIndex can be the same as the last one.
     func pageView(_ pageView: PageView, didTransitionTo pageIndex: Int)
