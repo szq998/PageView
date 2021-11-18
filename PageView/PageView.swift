@@ -63,6 +63,8 @@ public class PageView: UIScrollView {
         showsHorizontalScrollIndicator = false
         showsVerticalScrollIndicator = false
         bounces = true
+        clipsToBounds = true
+        contentInsetAdjustmentBehavior = .never
         delegate = self
         
         for page in [mainPage, prevPage, nextPage] {
