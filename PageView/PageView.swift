@@ -10,6 +10,17 @@ import UIKit
 
 class PageContainerView: UIView {
     
+    init(containingPageView: PageView) {
+        super.init(frame: .zero)
+        self.containingPageView = containingPageView
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    weak var containingPageView: PageView!
+    
     var removeSubviewOnHidden = false
     override var isHidden: Bool {
         get { super.isHidden }
@@ -36,6 +47,10 @@ class PageContainerView: UIView {
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.frame = .init(x: 0, y: 0, width: bounds.width, height: bounds.height)
         super.addSubview(view)
+    }
+    
+    override var safeAreaInsets: UIEdgeInsets {
+        return containingPageView.safeAreaInsets
     }
 }
 
@@ -90,9 +105,9 @@ public class PageView: UIScrollView {
         ])
     }
     
-    private var mainPage = PageContainerView()
-    private var prevPage = PageContainerView()
-    private var nextPage = PageContainerView()
+    lazy private var mainPage = PageContainerView(containingPageView: self)
+    lazy private var prevPage = PageContainerView(containingPageView: self)
+    lazy private var nextPage = PageContainerView(containingPageView: self)
     private var pageConstraints: [NSLayoutConstraint] = []
     
     private var pageContainerType: PageContainerType = .prev
@@ -111,6 +126,7 @@ public class PageView: UIScrollView {
         guard forceSet || !container.isContentSet || (container.isContentSet && container.contentView! !== pageContent) else { return }
         
         container.addSubview(pageContent)
+        pageDelegate?.pageView(self, didSetupPage: pageContent, to: pageIndex)
     }
     
     private func pageIndexDidSet() {
@@ -122,12 +138,12 @@ public class PageView: UIScrollView {
         
         if pageIndex == 0 {
             prevPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex)!, to: prevPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex), to: prevPage)
             nextPage.isHidden = true
             
             if numPages > 1 {
                 mainPage.isHidden = false
-                setup(pageContent: dataSource.pageView(self, pageAtIndex: 1)!, to: mainPage)
+                setup(pageContent: dataSource.pageView(self, pageAtIndex: 1), to: mainPage)
             } else {
                 mainPage.isHidden = true
             }
@@ -135,12 +151,12 @@ public class PageView: UIScrollView {
             pageContainerType = .prev
         } else if pageIndex == 1 {
             prevPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: 0)!, to: prevPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: 0), to: prevPage)
             mainPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: 1)!, to: mainPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: 1), to: mainPage)
             if numPages > 3 {
                 nextPage.isHidden = false
-                setup(pageContent: dataSource.pageView(self, pageAtIndex: 2)!, to: nextPage)
+                setup(pageContent: dataSource.pageView(self, pageAtIndex: 2), to: nextPage)
             } else {
                 nextPage.isHidden = true
             }
@@ -149,18 +165,18 @@ public class PageView: UIScrollView {
         } else if pageIndex == numPages - 1 {
             prevPage.isHidden = true
             mainPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1)!, to: mainPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1), to: mainPage)
             nextPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex)!, to: nextPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex), to: nextPage)
             
             pageContainerType = .next
         } else {
             prevPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1)!, to: prevPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1), to: prevPage)
             mainPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex)!, to: mainPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex), to: mainPage)
             nextPage.isHidden = false
-            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex + 1)!, to: nextPage)
+            setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex + 1), to: nextPage)
             
             pageContainerType = .main
         }
@@ -254,6 +270,20 @@ public class PageView: UIScrollView {
         }
     }
     
+    public var pageContentViews: [UIView] {
+        var views = [UIView]()
+        if let prev = prevPage.contentView {
+            views.append(prev)
+        }
+        if let main = mainPage.contentView {
+            views.append(main)
+        }
+        if let next = nextPage.contentView {
+            views.append(next)
+        }
+        return views
+    }
+    
     /// Page content view will be reloaded if reference of page content view changed.
     @objc public func reloadData() {
         if let dataSource = dataSource, (0..<dataSource.numberOfPages(in: self)).contains(pageIndex) == false {
@@ -311,7 +341,7 @@ extension PageView: UIScrollViewDelegate {
                 pageContainerType = .prev
             } else {
                 // at the previous page
-                setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1)!, to: nextPage)
+                setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1), to: nextPage)
                 (prevPage, mainPage, nextPage) = (nextPage, prevPage, mainPage)
                 
                 pageContainerType = .main
@@ -328,7 +358,7 @@ extension PageView: UIScrollViewDelegate {
                 pageContainerType = .next
             } else {
                 // next but not final
-                setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex + 1)!, to: prevPage)
+                setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex + 1), to: prevPage)
                 (prevPage, mainPage, nextPage) = (mainPage, nextPage, prevPage)
                 
                 pageContainerType = .main
@@ -341,7 +371,7 @@ extension PageView: UIScrollViewDelegate {
                 if numPages > 2 {
                     nextPage.isHidden = false
                     if !nextPage.isContentSet {
-                        setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex + 1)!, to: nextPage)
+                        setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex + 1), to: nextPage)
                     }
                 }
                 
@@ -351,7 +381,7 @@ extension PageView: UIScrollViewDelegate {
                 _pageIndex -= 1
                 prevPage.isHidden = false
                 if !prevPage.isContentSet {
-                    setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1)!, to: prevPage)
+                    setup(pageContent: dataSource.pageView(self, pageAtIndex: pageIndex - 1), to: prevPage)
                 }
                 
                 pageContainerType = .next
@@ -378,16 +408,19 @@ extension PageView: UIScrollViewDelegate {
 }
 
 // MARK: - DataSource & PageDelegate Protocal
-@objc public protocol PageViewDataSource: NSObjectProtocol {
+@objc public protocol PageViewDataSource: AnyObject {
     
     func numberOfPages(in pageView: PageView) -> Int
     
-    func pageView(_ pageView: PageView, pageAtIndex idx: Int) -> UIView?
+    func pageView(_ pageView: PageView, pageAtIndex idx: Int) -> UIView
 }
 
 
-@objc public protocol PageViewPageDelegate: NSObjectProtocol {
+@objc public protocol PageViewPageDelegate: AnyObject {
     
     /// Called when page switched. PageIndex can be the same as the last one.
     func pageView(_ pageView: PageView, didTransitionTo pageIndex: Int)
+    
+    /// Called after page content view added to view hierarchy, mainly to give delegate a chance to call didMoveTo(parent:).
+    func pageView(_ pageView: PageView, didSetupPage view: UIView, to index: Int)
 }
