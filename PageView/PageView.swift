@@ -126,7 +126,28 @@ public class PageView: UIScrollView {
         guard forceSet || !container.isContentSet || (container.isContentSet && container.contentView! !== pageContent) else { return }
         
         container.addSubview(pageContent)
-        pageDelegate?.pageView(self, didSetupPage: pageContent, to: pageIndex)
+        // figure out the pageIndex to tell delegate
+        let lastIndex = dataSource!.numberOfPages(in: self) - 1
+        var destPageIndex = pageIndex
+        
+        if pageIndex == 0 {
+            if container === mainPage {
+                destPageIndex += 1
+            }
+        } else if pageIndex == lastIndex {
+            if container === mainPage {
+                destPageIndex -= 1
+            }
+        } else {
+            if container === prevPage {
+                destPageIndex -= 1
+            } else if container === nextPage {
+                destPageIndex += 1
+            }
+        }
+        
+        
+        pageDelegate?.pageView(self, didSetupPage: pageContent, to: destPageIndex)
     }
     
     private func pageIndexDidSet() {
@@ -261,12 +282,13 @@ public class PageView: UIScrollView {
     public var pageIndex: Int {
         get { _pageIndex }
         set {
-            if let dataSource = dataSource, (0..<dataSource.numberOfPages(in: self)).contains(pageIndex) == false {
+            if let count = dataSource?.numberOfPages(in: self),
+               (0..<count).contains(newValue)
+            {
                 // make sure in the correct range
-                return
+                _pageIndex = newValue
+                pageIndexDidSet()
             }
-            _pageIndex = newValue
-            pageIndexDidSet()
         }
     }
     
